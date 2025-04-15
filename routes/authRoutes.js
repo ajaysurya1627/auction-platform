@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware"); // Import middleware
 
-// Register route
 router.post("/register", async (req, res) => {
     try {
         console.log("✅ Request received at /api/auth/register");
@@ -15,7 +14,6 @@ router.post("/register", async (req, res) => {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-        // No need to hash the password here; it's done in the model's pre-save hook
         const newUser = new User({ username, email, password });  // Directly save password
         await newUser.save();
 
@@ -26,7 +24,6 @@ router.post("/register", async (req, res) => {
 });
 
 
-// Login route
 router.post("/login", async (req, res) => {
     try {
         console.log("✅ Request received at /api/auth/login");
@@ -53,7 +50,6 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// 🔽 Paste the protected route **below the login route**
 router.get("/protected", authMiddleware, (req, res) => {
     res.json({ message: "This is a protected route", user: req.user });
 });
