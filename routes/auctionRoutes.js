@@ -3,7 +3,6 @@ const router = express.Router();
 const Auction = require("../models/Auction");
 const authMiddleware = require("../middleware/authMiddleware");
 
-// ✅ Create an Auction
 router.post("/create", authMiddleware, async (req, res) => {
     try {
         const { title, description, startingPrice, endTime } = req.body;
@@ -28,7 +27,6 @@ router.post("/create", authMiddleware, async (req, res) => {
     }
 });
 
-// ✅ Get All Auctions
 router.get("/", async (req, res) => {
     try {
         const auctions = await Auction.find().populate("seller", "username email");
@@ -38,7 +36,6 @@ router.get("/", async (req, res) => {
     }
 });
 
-// ✅ Get Auction by ID
 router.get("/:id", async (req, res) => {
     try {
         const auction = await Auction.findById(req.params.id).populate("seller", "username email");
@@ -51,7 +48,6 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-// ✅ Delete Auction (Only Seller Can Delete)
 router.delete("/:id", authMiddleware, async (req, res) => {
     try {
         const auction = await Auction.findById(req.params.id);
@@ -68,14 +64,12 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     }
 });
 
-// ✅ Place a Bid (with Expiry Check)
 router.post("/:id/bid", authMiddleware, async (req, res) => {
     try {
         const { amount } = req.body;
         const auctionId = req.params.id;
         const userId = req.user.userId;
 
-        // Validate bid amount
         if (!amount || amount <= 0) {
             return res.status(400).json({ message: "Invalid bid amount" });
         }
@@ -85,7 +79,6 @@ router.post("/:id/bid", authMiddleware, async (req, res) => {
             return res.status(404).json({ message: "Auction not found" });
         }
 
-        // Check if auction has ended
         const now = new Date();
         if (new Date(auction.endTime) < now) {
             auction.status = "expired"; // Update status in DB
@@ -97,7 +90,6 @@ router.post("/:id/bid", authMiddleware, async (req, res) => {
             return res.status(400).json({ message: "Bid must be higher than the current price" });
         }
 
-        // Update auction with new bid
         auction.bids.push({ bidder: userId, amount });
         auction.currentPrice = amount;
         auction.highestBidder = userId;
