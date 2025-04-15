@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const Auction = require("./models/Auction");
 const connectDB = require("./config");
 
-// Connect to database
 connectDB();
 
 const expireAuctions = async () => {
@@ -13,20 +12,18 @@ const expireAuctions = async () => {
             { $set: { status: "expired" } }
         );
 
-        console.log(`✅ Expired ${expiredAuctions.modifiedCount} auctions`);
+        console.log(` Expired ${expiredAuctions.modifiedCount} auctions`);
         process.exit();
     } catch (error) {
-        console.error("❌ Error expiring auctions:", error);
+        console.error(" Error expiring auctions:", error);
         process.exit(1);
     }
 };
 
-// Run the function
 const cron = require("node-cron");
 const expireAuctions = require("./expireAuctions");
 
-// Run the job every minute
 cron.schedule("* * * * *", () => {
-    console.log("🔄 Checking for expired auctions...");
+    console.log(" Checking for expired auctions...");
     expireAuctions();
 });
